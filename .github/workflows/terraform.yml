@@ -21,6 +21,17 @@ jobs:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA }}
 
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        
+      - name: Read Secret Manager Secret
+        run: |
+            DB_PASSWORD=$(gcloud secrets versions access latest \
+            --secret=db-password)
+        
+            echo "::add-mask::$DB_PASSWORD"
+            echo "DB_PASSWORD=$DB_PASSWORD" >> $GITHUB_ENV
+
       - uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
@@ -37,4 +48,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./terraform
-        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
+        run: |
+          terraform apply -auto-approve \
+            -var="project_id=${{ secrets.GCP_PROJECT_ID }}" \
+            -var="db_password=${DB_PASSWORD}"
