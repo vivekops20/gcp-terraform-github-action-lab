@@ -23,10 +23,18 @@ jobs:
 
       - uses: hashicorp/setup-terraform@v3
 
-      - run: terraform init
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
 
-      - run: terraform validate
+      - name: Terraform Validate
+        working-directory: ./terraform
+        run: terraform validate
 
-      - run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
 
-      - run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}"
